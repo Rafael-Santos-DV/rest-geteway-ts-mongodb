@@ -4,7 +4,7 @@ interface CartCode {
   carCode: string;
   code: string;
   status: 'started' | 'processing' | 'pending' | 'approved' | 'refused' | 'refunded' | 'chargeback' | 'error';
-  paymentType: 'billet' | 'credit_cart';
+  paymentType: 'billet' | 'credit_card';
   installments: number;
   total: number;
   transactionId: string;

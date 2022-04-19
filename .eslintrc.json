@@ -17,6 +17,7 @@
       "@typescript-eslint"
   ],
   "rules": {
+    "no-shadow": "off",
     "no-console": "off",
     "class-methods-use-this": "off",
     "consistent-return": "off",
