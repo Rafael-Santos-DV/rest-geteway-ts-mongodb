@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import Cart from '../models/Cart';
-import Transactions from '../models/Transactions';
+import Transactions, { CartCode } from '../models/Transactions';
 
 type CustomerValues = {
   name: string;
@@ -36,7 +36,7 @@ interface ProcessType {
 }
 
 class TransactionsService {
-  async process(params: ProcessType) {
+  async process(params: ProcessType): Promise<CartCode> {
     const cart = await Cart.findOne({ code: params.cartCode });
 
     if (!cart) {

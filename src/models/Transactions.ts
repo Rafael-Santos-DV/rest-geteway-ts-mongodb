@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-interface CartCode {
+export interface CartCode {
   carCode: string;
   code: string;
   status: 'started' | 'processing' | 'pending' | 'approved' | 'refused' | 'refunded' | 'chargeback' | 'error';
