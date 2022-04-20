@@ -1,41 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
+import CartCode from '../@types/cartCodeTypes';
+import ProcessType from '../@types/transactionTypes';
 import Cart from '../models/Cart';
-import Transactions, { CartCode } from '../models/Transactions';
-
-type CustomerValues = {
-  name: string;
-  email: string;
-  mobile: string;
-  document:string;
-}
-
-type BillingValues = {
-  address: string;
-  city: string;
-  number: string;
-  state: string;
-  zipcode: string;
-  neighborhood: string;
-}
-
-type creditValues = {
-  number: string;
-  expiration: string;
-  holdername: string;
-  cvv: string;
-}
-
-interface ProcessType {
-  cartCode: string;
-  paymentType: string;
-  installments: number;
-  customer: CustomerValues,
-  billing: BillingValues;
-  creditCard: creditValues;
-
-}
+import Transactions from '../models/Transactions';
+import PagarMeProvider from '../providers/PagarMeProvider';
 
 class TransactionsService {
+  private paymentProvider;
+
+  constructor() {
+    this.paymentProvider = new PagarMeProvider();
+  }
+
   async process(params: ProcessType): Promise<CartCode> {
     const cart = await Cart.findOne({ code: params.cartCode });
 
@@ -43,7 +19,7 @@ class TransactionsService {
       throw `Cart ${params.cartCode} was not found!`;
     }
     const {
-      billing, cartCode, customer, installments, paymentType,
+      billing, cartCode, customer, installments, paymentType, creditCard,
     } = params;
 
     const transaction = await Transactions.create({
@@ -65,6 +41,15 @@ class TransactionsService {
       total: cart.price,
     });
 
+    this.paymentProvider.process({
+      billing,
+      creditCard,
+      customer,
+      installments,
+      paymentType,
+      total: cart.price,
+      transactionCode: cart.code,
+    })
     return transaction;
   }
 }

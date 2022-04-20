@@ -30,6 +30,7 @@
     "express": "^4.17.3",
     "libphonenumber-js": "^1.9.51",
     "mongoose": "^6.3.0",
+    "pagarme": "^4.23.0",
     "uuid": "^8.3.2",
     "yup": "^0.32.11"
   }

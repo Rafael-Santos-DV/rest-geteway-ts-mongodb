@@ -103,7 +103,7 @@ class TransactionsController {
         customer: {
           document: customerDocument,
           email: customerEmail,
-          mobile: customerMobile,
+          mobile: parsePhoneNumber(customerMobile || '', 'BR').format('E.164'),
           name: customerName,
         },
         installments,
