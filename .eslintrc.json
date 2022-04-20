@@ -17,6 +17,7 @@
       "@typescript-eslint"
   ],
   "rules": {
+    "no-throw-literal": "off",
     "no-shadow": "off",
     "no-console": "off",
     "class-methods-use-this": "off",
@@ -26,7 +27,8 @@
       "ignorePackages",
       {
         "js": "never",
-        "ts": "never"
+        "ts": "never",
+        "mjs": "never"
       }
    ]
 

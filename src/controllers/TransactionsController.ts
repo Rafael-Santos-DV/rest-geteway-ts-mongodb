@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
 import * as Yup from 'yup';
-import parsePhoneNumberFromString from 'libphonenumber-js';
 import { cpf, cnpj } from 'cpf-cnpj-validator';
+import { parsePhoneNumber } from 'libphonenumber-js';
+import Cart from '../models/Cart';
+import TransactionsService from '../services/TransactionsService';
 
 class TransactionsController {
   async create(req: Request, res: Response) {
@@ -40,14 +42,14 @@ class TransactionsController {
           .test(
             'is-valid-mobile',
             'is not a mobile number',
-            (value) => parsePhoneNumberFromString(value, 'BR').isValid(),
+            (value) => parsePhoneNumber(value || '', 'BR').isValid(),
           ),
         customerDocument: Yup.string().required()
           .test(
             'is-valid-cpf/cnpj',
             'is not a cpf/cnpj valid',
             (value) => (
-              cpf.isValid(value) || cnpj.isValid(value)
+              cpf.isValid(value || '') || cnpj.isValid(value || '')
             ),
           ),
         billingAddress: Yup.string().required(),
@@ -78,7 +80,37 @@ class TransactionsController {
         return res.status(400).json({ error: 'Error on validate schema.' });
       }
 
-      return res.status(200).json();
+      const cart = await Cart.findOne({ code: cartCode });
+
+      if (!cart) return res.status(404).json();
+
+      const resultTransaction = await TransactionsService.process({
+        billing: {
+          address: billingAddress,
+          city: billingCity,
+          neighborhood: billingNeighborhood,
+          number: billingNumber,
+          state: billingState,
+          zipcode: billingZipCode,
+        },
+        cartCode,
+        creditCard: {
+          number: creditCardNumber,
+          holdername: creditCardHolderName,
+          expiration: creditCardExpiretion,
+          cvv: creditCardCvv,
+        },
+        customer: {
+          document: customerDocument,
+          email: customerEmail,
+          mobile: customerMobile,
+          name: customerName,
+        },
+        installments,
+        paymentType,
+      });
+
+      return res.status(200).json(resultTransaction);
     } catch (err) {
       return res.status(500).json({ error: 'internal server error.' });
     }
