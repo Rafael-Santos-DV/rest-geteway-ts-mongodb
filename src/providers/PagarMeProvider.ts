@@ -3,10 +3,10 @@ import pagarme from 'pagarme';
 import { Transaction } from 'pagarme-js-types/src/client/transactions/responses';
 
 import ReceiverProcess from '../@types/receiveProcessTypes';
+import typesTranslateStatus from '../@types/translateStatusTypes';
 import IPaymentProvider from '../contracts/IPaymentProvider';
 
 type paymentMethodTypes = {
-  // payment_method?: 'boleto' | 'credit_card',
   amount: number,
   installments: string,
   card_holder_name?: string;
@@ -21,7 +21,7 @@ class PagarMeProvider implements IPaymentProvider {
     const {
       installments, creditCard, total, paymentType, customer, billing, items, transactionCode,
     } = params;
-
+    this.transtaleStatus('authorized');
     const creditCardParams: paymentMethodTypes = {
       // payment_method: 'credit_card',
       amount: total * 100,
@@ -133,8 +133,21 @@ class PagarMeProvider implements IPaymentProvider {
       default:
         throw `Payment ${paymentType} is not found!`;
     }
+    console.log(response);
+  }
 
-    console.debug(response);
+  transtaleStatus(status: typesTranslateStatus): string {
+    const statusMap = new Map();
+    statusMap.set('processing', 'processing');
+    statusMap.set('waiting_payment', 'pending');
+    statusMap.set('authorized', 'pending');
+    statusMap.set('paid', 'approved');
+    statusMap.set('refused', 'refused');
+    statusMap.set('pending_refund', 'refunded');
+    statusMap.set('refunded', 'refunded');
+    statusMap.set('chargeback', 'chargeback');
+
+    return statusMap.get(status);
   }
 }
 
