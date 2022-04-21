@@ -2,7 +2,7 @@ export default interface CartCode {
   carCode: string;
   code: string;
   status: 'started' | 'processing' | 'pending' | 'approved' | 'refused' | 'refunded' | 'chargeback' | 'error';
-  paymentType: 'billet' | 'credit_card';
+  paymentType: 'billet' | 'credit_card' | 'pix';
   installments: number;
   total: number;
   transactionId: string;

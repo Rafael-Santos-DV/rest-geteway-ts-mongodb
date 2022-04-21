@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { CartCode } from '../@types/cartCodeTypes';
+import CartCode from '../@types/cartCodeTypes';
 
 const Schema = new mongoose.Schema<CartCode>(
   {
@@ -28,7 +28,7 @@ const Schema = new mongoose.Schema<CartCode>(
     },
     paymentType: {
       type: String,
-      enum: ['billet', 'credit_card'],
+      enum: ['billet', 'credit_card', 'pix'],
       required: true,
     },
     installments: {
