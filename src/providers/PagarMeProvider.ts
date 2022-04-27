@@ -3,6 +3,7 @@ import pagarme from 'pagarme';
 import { Transaction } from 'pagarme-js-types/src/client/transactions/responses';
 
 import ReceiverProcess from '../@types/receiveProcessTypes';
+import ResponseProcessPayment from '../@types/response';
 import typesTranslateStatus from '../@types/translateStatusTypes';
 import IPaymentProvider from '../contracts/IPaymentProvider';
 
@@ -17,7 +18,7 @@ type paymentMethodTypes = {
 }
 
 class PagarMeProvider implements IPaymentProvider {
-  async process(params: ReceiverProcess) {
+  async process(params: ReceiverProcess): Promise<ResponseProcessPayment> {
     const {
       installments, creditCard, total, paymentType, customer, billing, items, transactionCode,
     } = params;
@@ -133,7 +134,19 @@ class PagarMeProvider implements IPaymentProvider {
       default:
         throw `Payment ${paymentType} is not found!`;
     }
-    console.log(response);
+
+    return {
+      billet: {
+        barCode: response.boleto_barcode,
+        url: response.boleto_url,
+      },
+      card: {
+        id: String(response.acquirer_id),
+      },
+      processorResponse: JSON.stringify(response),
+      status: this.transtaleStatus(response.status),
+      transationId: String(response.id),
+    };
   }
 
   transtaleStatus(status: typesTranslateStatus): string {

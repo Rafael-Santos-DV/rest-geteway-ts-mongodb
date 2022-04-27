@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import CartCode from '../@types/cartCodeTypes';
+import ResponseProcessPayment from '../@types/response';
 import ProcessType from '../@types/transactionTypes';
 import Cart from '../models/Cart';
 import Transactions from '../models/Transactions';
@@ -12,7 +12,7 @@ class TransactionsService {
     this.paymentProvider = new PagarMeProvider();
   }
 
-  async process(params: ProcessType): Promise<CartCode> {
+  async process(params: ProcessType): Promise<ResponseProcessPayment> {
     const cart = await Cart.findOne({ code: params.cartCode });
 
     if (!cart) {
@@ -41,7 +41,7 @@ class TransactionsService {
       total: cart.price,
     });
 
-    this.paymentProvider.process({
+    const response = await this.paymentProvider.process({
       billing,
       creditCard,
       customer,
@@ -49,8 +49,15 @@ class TransactionsService {
       paymentType,
       total: cart.price,
       transactionCode: cart.code,
-    })
-    return transaction;
+    });
+
+    transaction.updateOne({
+      transationId: response.transationId,
+      status: response.status,
+      processorResponse: response.processorResponse,
+    });
+
+    return response;
   }
 }
 
