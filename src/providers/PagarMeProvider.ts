@@ -22,7 +22,7 @@ class PagarMeProvider implements IPaymentProvider {
     const {
       installments, creditCard, total, paymentType, customer, billing, items, transactionCode,
     } = params;
-    this.transtaleStatus('authorized');
+
     const creditCardParams: paymentMethodTypes = {
       // payment_method: 'credit_card',
       amount: total * 100,

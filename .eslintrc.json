@@ -17,6 +17,7 @@
       "@typescript-eslint"
   ],
   "rules": {
+    "camelcase": "off",
     "no-throw-literal": "off",
     "import/no-extraneous-dependencies": "off",
     "semi": "off",

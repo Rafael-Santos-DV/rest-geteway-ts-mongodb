@@ -6,7 +6,7 @@ import Transactions from '../models/Transactions';
 import PagarMeProvider from '../providers/PagarMeProvider';
 
 class TransactionsService {
-  private paymentProvider;
+  public paymentProvider;
 
   constructor() {
     this.paymentProvider = new PagarMeProvider();
@@ -51,7 +51,7 @@ class TransactionsService {
       transactionCode: cart.code,
     });
 
-    transaction.updateOne({
+    await transaction.updateOne({
       transationId: response.transationId,
       status: response.status,
       processorResponse: response.processorResponse,
@@ -59,6 +59,19 @@ class TransactionsService {
 
     return response;
   }
+
+  async updateStatus(code: string, providerStatus: string) {
+    const transaction = Transactions.findOne({ code });
+
+    if (!transaction) throw `Transaction ${code} not found.`;
+
+    const status = this.paymentProvider.transtaleStatus(providerStatus);
+    if (!status) throw 'Status is empty.';
+
+    await transaction.updateOne({
+      status,
+    });
+  }
 }
 
-export default new TransactionsService();
+export default TransactionsService;

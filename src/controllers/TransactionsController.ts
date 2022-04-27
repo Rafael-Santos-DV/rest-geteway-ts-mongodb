@@ -84,7 +84,7 @@ class TransactionsController {
 
       if (!cart) return res.status(404).json();
 
-      const resultTransaction = await TransactionsService.process({
+      const resultTransaction = await new TransactionsService().process({
         billing: {
           address: billingAddress,
           city: billingCity,
@@ -112,6 +112,7 @@ class TransactionsController {
 
       return res.status(200).json(resultTransaction);
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ error: 'internal server error.' });
     }
   }
